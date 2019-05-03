@@ -1,0 +1,102 @@
+﻿<?xml version="1.0" encoding="utf-8"?><Database Name="GymPanZee" Class="GympanzeeDBDataContext" xmlns="http://schemas.microsoft.com/linqtosql/dbml/2007">
+  <Connection Mode="WebSettings" ConnectionString="Data Source=52.173.135.39;Initial Catalog=GymPanZee;Persist Security Info=True;User ID=ClientBilling" SettingsObjectName="System.Configuration.ConfigurationManager.ConnectionStrings" SettingsPropertyName="GymPanZeeConnectionString1" Provider="System.Data.SqlClient" />
+  <Table Name="dbo.BodyHalf" Member="BodyHalfs">
+    <Type Name="BodyHalf">
+      <Column Name="ID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="Value" Type="System.String" DbType="VarChar(25)" CanBeNull="true" />
+      <Association Name="BodyHalf_TargetBodyPart" Member="TargetBodyParts" ThisKey="ID" OtherKey="BodyHalfID" Type="TargetBodyPart" />
+    </Type>
+  </Table>
+  <Table Name="dbo.ExerciseCategorys" Member="ExerciseCategories">
+    <Type Name="ExerciseCategory">
+      <Column Name="ID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="Type" Type="System.String" DbType="VarChar(255)" CanBeNull="true" />
+      <Column Name="ExerciseEquipmentCategory" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Association Name="ExerciseCategory_ExerciseMachine" Member="ExerciseMachines" ThisKey="ID" OtherKey="ExerciseCategoryID" Type="ExerciseMachine" />
+      <Association Name="ExerciseEquipmentCategory_ExerciseCategory" Member="ExerciseEquipmentCategory1" ThisKey="ExerciseEquipmentCategory" OtherKey="ID" Type="ExerciseEquipmentCategory" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.ExerciseEquipmentCategory" Member="ExerciseEquipmentCategories">
+    <Type Name="ExerciseEquipmentCategory">
+      <Column Name="ID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="Value" Type="System.String" DbType="VarChar(255)" CanBeNull="true" />
+      <Association Name="ExerciseEquipmentCategory_ExerciseCategory" Member="ExerciseCategories" ThisKey="ID" OtherKey="ExerciseEquipmentCategory" Type="ExerciseCategory" />
+    </Type>
+  </Table>
+  <Table Name="dbo.ExerciseMachines" Member="ExerciseMachines">
+    <Type Name="ExerciseMachine">
+      <Column Name="ID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="ExerciseCategoryID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Type" Type="System.String" DbType="VarChar(255)" CanBeNull="true" />
+      <Column Name="TargetBodyPartID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Association Name="ExerciseMachine_Activity" Member="Activities" ThisKey="ID" OtherKey="ExerciseMachineID" Type="Activity" />
+      <Association Name="ExerciseCategory_ExerciseMachine" Member="ExerciseCategory" ThisKey="ExerciseCategoryID" OtherKey="ID" Type="ExerciseCategory" IsForeignKey="true" />
+      <Association Name="TargetBodyPart_ExerciseMachine" Member="TargetBodyPart" ThisKey="TargetBodyPartID" OtherKey="ID" Type="TargetBodyPart" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Facility" Member="Facilities">
+    <Type Name="Facility">
+      <Column Name="ID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="Name" Type="System.String" DbType="VarChar(255)" CanBeNull="true" />
+      <Column Name="Lat" Type="System.Single" DbType="Real" CanBeNull="true" />
+      <Column Name="Long" Type="System.Single" DbType="Real" CanBeNull="true" />
+      <Association Name="Facility_Activity" Member="Activities" ThisKey="ID" OtherKey="FacilityID" Type="Activity" />
+    </Type>
+  </Table>
+  <Table Name="dbo.TargetBodyPart" Member="TargetBodyParts">
+    <Type Name="TargetBodyPart">
+      <Column Name="ID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="BodyHalfID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Value" Type="System.String" DbType="VarChar(255)" CanBeNull="true" />
+      <Association Name="TargetBodyPart_ExerciseMachine" Member="ExerciseMachines" ThisKey="ID" OtherKey="TargetBodyPartID" Type="ExerciseMachine" />
+      <Association Name="BodyHalf_TargetBodyPart" Member="BodyHalf" ThisKey="BodyHalfID" OtherKey="ID" Type="BodyHalf" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Users" Member="Users">
+    <Type Name="User">
+      <Column Name="ID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="Username" Type="System.String" DbType="VarChar(255)" CanBeNull="true" />
+      <Column Name="Password" Type="System.String" DbType="VarChar(255)" CanBeNull="true" />
+      <Association Name="User_Activity" Member="Activities" ThisKey="ID" OtherKey="UserID" Type="Activity" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Activity" Member="Activities">
+    <Type Name="Activity">
+      <Column Name="ID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="Date" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="UserID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="FacilityID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="ExerciseMachineID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Reps" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Weights" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Time" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Other" Type="System.String" DbType="VarChar(MAX)" CanBeNull="true" />
+      <Column Name="Sets" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Notes" Type="System.String" DbType="VarChar(MAX)" CanBeNull="true" />
+      <Association Name="ExerciseMachine_Activity" Member="ExerciseMachine" ThisKey="ExerciseMachineID" OtherKey="ID" Type="ExerciseMachine" IsForeignKey="true" />
+      <Association Name="Facility_Activity" Member="Facility" ThisKey="FacilityID" OtherKey="ID" Type="Facility" IsForeignKey="true" />
+      <Association Name="User_Activity" Member="User" ThisKey="UserID" OtherKey="ID" Type="User" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Function Name="dbo.insertUsers" Method="insertUsers">
+    <Parameter Name="Users" Parameter="users" Type="System.String" DbType="VarChar(255)" />
+    <Parameter Name="Password" Parameter="password" Type="System.String" DbType="VarChar(255)" />
+    <Return Type="System.Int32" />
+  </Function>
+  <Function Name="dbo.Login" Method="Login">
+    <Parameter Name="Username" Parameter="username" Type="System.String" DbType="VarChar(255)" />
+    <Return Type="System.Int32" />
+  </Function>
+  <Function Name="dbo.insertactivity" Method="insertactivity">
+    <Parameter Name="userid" Type="System.Int32" DbType="Int" />
+    <Parameter Name="facilityid" Type="System.Int32" DbType="Int" />
+    <Parameter Name="exercisemachineid" Type="System.Int32" DbType="Int" />
+    <Parameter Name="reps" Type="System.Int32" DbType="Int" />
+    <Parameter Name="weights" Type="System.Int32" DbType="Int" />
+    <Parameter Name="time" Type="System.Int32" DbType="Int" />
+    <Parameter Name="other" Type="System.String" DbType="VarChar(MAX)" />
+    <Parameter Name="sets" Type="System.Int32" DbType="Int" />
+    <Parameter Name="notes" Type="System.String" DbType="VarChar(MAX)" />
+    <Return Type="System.Int32" />
+  </Function>
+</Database>

@@ -1,0 +1,73 @@
+﻿<script src="https://apis.google.com/js/platform.js" async defer></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script>
+    //Get URL Parameters
+    function getParameterByName(name, url) {
+        if (!url) url = window.location.href;
+        name = name.replace(/[\[\]]/g, "\\$&");
+        var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+            results = regex.exec(url);
+        if (!results) return null;
+        if (!results[2]) return '';
+        return decodeURIComponent(results[2].replace(/\+/g, " "));
+    }
+
+    var facilityid = getParameterByName('facility');
+    var exercisemachineid = getParameterByName('exercisemachineid');
+
+    //Get UserID
+    function onSignIn(googleUser) {
+        var profile = googleUser.getBasicProfile();
+        var login = {};
+        login.username = profile.getEmail();
+        login.profileid = profile.getId();
+        login.name = profile.getName();
+        login.image = profile.getImageUrl();
+        //console.log(login);
+
+        $.ajax({
+            url: "/Home/GetUserID",
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            async: false,
+            type: "POST",
+            data: JSON.stringify({ useremail: login.username }),
+            success: function (json) {
+                //console.log(json);
+
+                //Redirects User if they have already logged in
+                if (login.name && facilityid) {
+                    $('#user').html("<hr><div class='row' align='center'><img src='" + login.image + "' /></div><div class='row' align='center'><h3><a href='../home/Activity?username=" + json.UserID + "&id=" + login.profileid + "&exercisemachineid=" + exercisemachineid + "&facility=" + facilityid + "' class='text-center'>Welcome " + login.name + "</a></h3></div>");
+                }
+                else if (login.name)
+                {
+                    $('#user').html("<hr><div class='row' align='center'><img src='" + login.image + "' /></div><div class='row' align='center'><h3><a href='../home/Summary?userid=" + json.UserID + "&id=" + login.profileid + "' class='text-center'>Welcome " + login.name + "</a></h3></div>");
+                }
+            },
+            error: function () {
+                console.log("ERROR");
+            }
+        });
+
+    };
+
+
+</script>
+<style>
+    body {
+         background-image: url("/Content/Image/pattern-bg.png"); 
+    }
+</style>
+
+
+    <div class="row">
+        <div class="col-sm-4"></div>
+           <meta name="google-signin-client_id" content="735833674115-8utnfgiuqhpsnf4gt5mtp06okdkr324g.apps.googleusercontent.com">
+    </div>
+        <div class="col-sm-4"></div>
+
+        <div class="container">
+            <h2>Sign In</h2>
+                <div class="g-signin2 testing" align="center" data-onsuccess="onSignIn"></div>
+                <div id="user"></div>
+        </div>
