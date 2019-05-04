@@ -35,6 +35,9 @@ namespace GymPanzee.Models
         public string label { get; set; }
         public int value { get; set; }
         public string tooltext { get; set; }
+        public int reps { get; set; }
+        public int sets { get; set; }
+        public int weights { get; set; }
         //public string anchorBorderColor { get; set; }
         //public string anchorBgColor { get; set; }
         //public string anchorHoverScale { get; set; }

@@ -117,6 +117,23 @@
         <div class="col-md-4" id="previous"></div>
         <div class="col-md-4"></div>
     </div>
+
+    <div class="row">
+        <table class="table" id="previoustable">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Sets</th>
+                    <th>Reps</th>
+                    <th>Weights</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+
+            </tbody>
+        </table>
+    </div>
 </body>
 <script>
 
@@ -136,6 +153,19 @@
             jsonactivity.Machine = exercisechange;
 
             $(document).ready(function () {
+
+                $.ajax({
+                    url: "/Home/ActivityTable",
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    async: false,
+                    type: "POST",
+                    data: JSON.stringify(jsonactivity),
+                    success: function (json) {
+                        console.log(json);
+                    }
+                });
+
                 $.ajax({
                     url: "/Home/Activities",
                     contentType: "application/json; charset=utf-8",
@@ -146,7 +176,20 @@
                     success: function (json) {
                         previousworkout = json;
                         console.log(json);
+                        for (x = 0; x < json.length; x++)
+                        {
+                            let change; 
+                            if (x > 0) {
+                                change = ((json[x].sets * json[x].reps * json[x].weights) - (json[x - 1].sets * json[x - 1].reps * json[x - 1].weights)) / (json[x - 1].sets * json[x - 1].reps * json[x - 1].weights)*100;
+                            }
+                            else
+                            {
+                                change = "";
+                            }
 
+                            $("#previoustable tr:last").after("<tr><td>" + json[x].label + "</td><td>" + json[x].sets + "</td><td>" + json[x].reps + "</td><td>" + json[x].weights + "</td><td>" + Math.round(change) + "%</td></tr>");
+                        }
+                       
                         FusionCharts.ready(function () {
                             var fusioncharts = new FusionCharts({
                                 type: 'area2D',
@@ -212,7 +255,6 @@
         $("#exercisemachine").append($("<span value='" + excercises[0].IDjson + "'>" + excercises[0].Typejson + "</span>"));
         jsonactivity.Machine = exercisemachineid;
 
-        $(document).ready(function () {
             $.ajax({
                 url: "/Home/Activities",
                 contentType: "application/json; charset=utf-8",
@@ -223,6 +265,19 @@
                 success: function (json) {
                     previousworkout = json;
                     console.log(json);
+
+                    for (x = 0; x < json.length; x++) {
+                        let change;
+                        if (x > 0) {
+                            change = ((json[x].sets * json[x].reps * json[x].weights) - (json[x - 1].sets * json[x - 1].reps * json[x - 1].weights)) / (json[x - 1].sets * json[x - 1].reps * json[x - 1].weights) * 100;
+                        }
+                        else {
+                            change = "";
+                        }
+
+                        $("#previoustable tr:last").after("<tr><td>" + json[x].label + "</td><td>" + json[x].sets + "</td><td>" + json[x].reps + "</td><td>" + json[x].weights + "</td><td>" + Math.round(change) + "%</td></tr>");
+                    }
+
                     FusionCharts.ready(function () {
                         var fusioncharts = new FusionCharts({
                             type: 'area2D',
@@ -258,7 +313,7 @@
                     console.log("ERROR");
                 }
             });
-        });
+        };
         //insert activites
         $("#submit").click(function () {
             var InsertActivtyData = { 'UserID': usernameurl, 'FacilityID': facilityid, 'ExerciseMachineID': exercisemachineid, 'Sets': $('#sets').val(),  'Reps': $('#reps').val(), 'Weights': $('#weights').val(), 'Time': $('#time').val(), 'Other': $('#other').val() };
@@ -280,7 +335,8 @@
             });
             location.reload(true);
         });
-    }
+
+
 
 </script>
 <div id="charts"></div>

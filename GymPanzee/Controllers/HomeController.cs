@@ -13,8 +13,11 @@ using MongoDB.Driver.Core;
 
 namespace GymPanzee.Controllers
 {
+    
     public class HomeController : Controller
     {
+        GympanzeeDBDataContext _dt = new GympanzeeDBDataContext();
+
         public void InserttheActivity()
         {
             Activity act = new Activity();
@@ -123,13 +126,27 @@ namespace GymPanzee.Controllers
                 {
                     label = a.Date.ToString("MM/dd/yyyy"),
                     value = (Convert.ToInt32(ActivityDataSet.Where(x => x.Date.Date == a).Sum(x => x.Reps) * Convert.ToInt32(ActivityDataSet.Where(x => x.Date.Date == a).Sum(x => x.Weights))) * Convert.ToInt32(ActivityDataSet.Where(x => x.Date.Date == a).Sum(x => x.Sets))),
-                    tooltext = "Avg Reps: " + Convert.ToInt32(ActivityDataSet.Where(x => x.Date.Date == a).Average(x => x.Reps)) + "{br}" + "Avg Weights: " + Convert.ToInt32(ActivityDataSet.Where(x => x.Date.Date == a).Average(x => x.Weights)) + "{br}" + "Avg Sets: " + Convert.ToInt32(ActivityDataSet.Where(x => x.Date.Date == a).Average(x => x.Sets))
+                    tooltext = "Avg Reps: " + Convert.ToInt32(ActivityDataSet.Where(x => x.Date.Date == a).Average(x => x.Reps)) + "{br}" + "Avg Weights: " + Convert.ToInt32(ActivityDataSet.Where(x => x.Date.Date == a).Average(x => x.Weights)) + "{br}" + "Avg Sets: " + Convert.ToInt32(ActivityDataSet.Where(x => x.Date.Date == a).Average(x => x.Sets)),
+                    weights = Convert.ToInt32(ActivityDataSet.Where(x => x.Date.Date == a).Average(x => x.Weights)),
+                    reps = Convert.ToInt32(ActivityDataSet.Where(x => x.Date.Date == a).Average(x => x.Reps)), 
+                    sets = Convert.ToInt32(ActivityDataSet.Where(x => x.Date.Date == a).Average(x => x.Sets))
 
                 };
                 exercisemachinechartlist.Add(exercisemachineobj);
             }
 
             return Json(exercisemachinechartlist, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        public JsonResult ActivityTable(int User, int Machine)
+        {
+            var ActivityDataSet = (from a in _dt.Activities
+                                   where a.UserID == User && a.ExerciseMachineID == Machine
+                                   select new { a.Date, a.Reps, a.Weights, a.Sets, a.Other }).ToList();
+
+            return Json(ActivityDataSet, JsonRequestBehavior.AllowGet);
+
         }
 
         [HttpPost]
