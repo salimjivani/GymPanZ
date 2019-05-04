@@ -222,7 +222,7 @@
                 data: JSON.stringify(jsonactivity),
                 success: function (json) {
                     previousworkout = json;
-
+                    console.log(json);
                     FusionCharts.ready(function () {
                         var fusioncharts = new FusionCharts({
                             type: 'area2D',
