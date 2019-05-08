@@ -15,6 +15,7 @@
     var facilityid = getParameterByName('facility');
     var exercisemachineid = getParameterByName('exercisemachineid');
 
+
     //Get UserID
     function onSignIn(googleUser) {
         var profile = googleUser.getBasicProfile();
@@ -36,10 +37,11 @@
                 //console.log(json);
 
                 //Redirects User if they have already logged in
-                if (login.name && facilityid) {
+                if (facilityid && exercisemachineid) {
                     $('#user').html("<hr><div class='row' align='center'><img src='" + login.image + "' /></div><div class='row' align='center'><h3><a href='../home/Activity?username=" + json.UserID + "&id=" + login.profileid + "&exercisemachineid=" + exercisemachineid + "&facility=" + facilityid + "' class='text-center'>Welcome " + login.name + "</a></h3></div>");
                 }
-                else if (login.name)
+                //else if (login.name)
+                else
                 {
                     $('#user').html("<hr><div class='row' align='center'><img src='" + login.image + "' /></div><div class='row' align='center'><h3><a href='../home/Summary?userid=" + json.UserID + "&id=" + login.profileid + "' class='text-center'>Welcome " + login.name + "</a></h3></div>");
                 }

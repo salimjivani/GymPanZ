@@ -123,9 +123,9 @@
             <thead>
                 <tr>
                     <th>Date</th>
-                    <th>Sets</th>
-                    <th>Reps</th>
-                    <th>Weights</th>
+                    <th> # Sets</th>
+                    <th>Avg. Reps</th>
+                    <th>Avg. Weights</th>
                     <th></th>
                 </tr>
             </thead>
@@ -190,36 +190,36 @@
                             $("#previoustable tr:last").after("<tr><td>" + json[x].label + "</td><td>" + json[x].sets + "</td><td>" + json[x].reps + "</td><td>" + json[x].weights + "</td><td>" + Math.round(change) + "%</td></tr>");
                         }
                        
-                        FusionCharts.ready(function () {
-                            var fusioncharts = new FusionCharts({
-                                type: 'area2D',
-                                //renderAt: 'chart-container',
-                                id: 'sample',
-                                width: '100%',
-                                height: '100%',
-                                containerBackgroundOpacity: "0",
-                                dataFormat: 'json',
-                                dataSource: {
-                                    "chart": {
+                        //FusionCharts.ready(function () {
+                        //    var fusioncharts = new FusionCharts({
+                        //        type: 'area2D',
+                        //        //renderAt: 'chart-container',
+                        //        id: 'sample',
+                        //        width: '100%',
+                        //        height: '100%',
+                        //        containerBackgroundOpacity: "0",
+                        //        dataFormat: 'json',
+                        //        dataSource: {
+                        //            "chart": {
                                         
-                                        //"subcaption": "For last year",
-                                        "xaxisname": "Dates",
-                                        "yaxisname": "Total Weights",
-                                        "numbersuffix": "lbs",
-                                        //"numberprefix": "$",
-                                        //Theme
-                                        "drawAnchors": "1",
-                                        "anchorBorderThickness": "4",
-                                        "anchorRadius": "10",
-                                        "canvasBgAlpha": "0",
-                                        "bgAlpha": "0",
-                                        "paletteColors": "#8a2be2"
-                                    },
-                                    "data": json
-                                }
-                            });
-                            fusioncharts.render("charts");
-                        });
+                        //                //"subcaption": "For last year",
+                        //                "xaxisname": "Dates",
+                        //                "yaxisname": "Total Weights",
+                        //                "numbersuffix": "lbs",
+                        //                //"numberprefix": "$",
+                        //                //Theme
+                        //                "drawAnchors": "1",
+                        //                "anchorBorderThickness": "4",
+                        //                "anchorRadius": "10",
+                        //                "canvasBgAlpha": "0",
+                        //                "bgAlpha": "0",
+                        //                "paletteColors": "#8a2be2"
+                        //            },
+                        //            "data": json
+                        //        }
+                        //    });
+                        //    fusioncharts.render("charts");
+                        //});
 
                     },
                     error: function () {
@@ -251,7 +251,6 @@
         });
     }
     else {
-        //Text
         $("#exercisemachine").append($("<span value='" + excercises[0].IDjson + "'>" + excercises[0].Typejson + "</span>"));
         jsonactivity.Machine = exercisemachineid;
 
@@ -278,63 +277,64 @@
                         $("#previoustable tr:last").after("<tr><td>" + json[x].label + "</td><td>" + json[x].sets + "</td><td>" + json[x].reps + "</td><td>" + json[x].weights + "</td><td>" + Math.round(change) + "%</td></tr>");
                     }
 
-                    FusionCharts.ready(function () {
-                        var fusioncharts = new FusionCharts({
-                            type: 'area2D',
-                            //renderAt: 'chart-container',
-                            id: 'sample',
-                            width: '100%',
-                            height: '100%',
-                            containerBackgroundOpacity: "0",
-                            dataFormat: 'json',
-                            dataSource: {
-                                "chart": {
-                                    "caption": "Historical Workout",
-                                    //"subcaption": "For last year",
-                                    "xaxisname": "Dates",
-                                    "yaxisname": "Total Weights",
-                                    "numbersuffix": "lbs",
-                                    //"numberprefix": "$",
-                                    //Theme
-                                    "drawAnchors": "1",
-                                    "anchorBorderThickness": "4",
-                                    "anchorRadius": "10",
-                                    "canvasBgAlpha": "0",
-                                    "bgAlpha": "0",
-                                    "paletteColors": "#8a2be2"
-                                },
-                                "data": json
-                            }
-                        });
-                        fusioncharts.render("charts");
-                    });
+                    //FusionCharts.ready(function () {
+                    //    var fusioncharts = new FusionCharts({
+                    //        type: 'area2D',
+                    //        //renderAt: 'chart-container',
+                    //        id: 'sample',
+                    //        width: '100%',
+                    //        height: '100%',
+                    //        containerBackgroundOpacity: "0",
+                    //        dataFormat: 'json',
+                    //        dataSource: {
+                    //            "chart": {
+                    //                "caption": "Historical Workout",
+                    //                //"subcaption": "For last year",
+                    //                "xaxisname": "Dates",
+                    //                "yaxisname": "Total Weights",
+                    //                "numbersuffix": "lbs",
+                    //                //"numberprefix": "$",
+                    //                //Theme
+                    //                "drawAnchors": "1",
+                    //                "anchorBorderThickness": "4",
+                    //                "anchorRadius": "10",
+                    //                "canvasBgAlpha": "0",
+                    //                "bgAlpha": "0",
+                    //                "paletteColors": "#8a2be2"
+                    //            },
+                    //            "data": json
+                    //        }
+                    //    });
+                    //    fusioncharts.render("charts");
+                    //});
                 },
                 error: function () {
                     console.log("ERROR");
                 }
+            });
+            $("#submit").click(function () {
+                var InsertActivtyData = { 'UserID': usernameurl, 'FacilityID': facilityid, 'ExerciseMachineID': exercisemachineid, 'Sets': $('#sets').val(), 'Reps': $('#reps').val(), 'Weights': $('#weights').val(), 'Time': $('#time').val(), 'Other': $('#other').val() };
+                InsertActivtyData = JSON.stringify(InsertActivtyData);
+                //console.log(InsertActivtyData);
+                $.ajax({
+                    url: "/Home/InsertActivities",
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    async: false,
+                    type: "POST",
+                    data: InsertActivtyData,
+                    success: function (json) {
+                        console.log(json);
+                    },
+                    error: function () {
+                        console.log("ERROR");
+                    }
+                });
+                location.reload(true);
             });
         };
         //insert activites
-        $("#submit").click(function () {
-            var InsertActivtyData = { 'UserID': usernameurl, 'FacilityID': facilityid, 'ExerciseMachineID': exercisemachineid, 'Sets': $('#sets').val(),  'Reps': $('#reps').val(), 'Weights': $('#weights').val(), 'Time': $('#time').val(), 'Other': $('#other').val() };
-            InsertActivtyData = JSON.stringify(InsertActivtyData);
-            //console.log(InsertActivtyData);
-            $.ajax({
-                url: "/Home/InsertActivities",
-                contentType: "application/json; charset=utf-8",
-                dataType: "json",
-                async: false,
-                type: "POST",
-                data: InsertActivtyData,
-                success: function (json) {
-                    console.log(json);
-                },
-                error: function () {
-                    console.log("ERROR");
-                }
-            });
-            location.reload(true);
-        });
+        
 
 
 

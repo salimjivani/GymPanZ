@@ -129,7 +129,7 @@ namespace GymPanzee.Controllers
                     tooltext = "Avg Reps: " + Convert.ToInt32(ActivityDataSet.Where(x => x.Date.Date == a).Average(x => x.Reps)) + "{br}" + "Avg Weights: " + Convert.ToInt32(ActivityDataSet.Where(x => x.Date.Date == a).Average(x => x.Weights)) + "{br}" + "Avg Sets: " + Convert.ToInt32(ActivityDataSet.Where(x => x.Date.Date == a).Average(x => x.Sets)),
                     weights = Convert.ToInt32(ActivityDataSet.Where(x => x.Date.Date == a).Average(x => x.Weights)),
                     reps = Convert.ToInt32(ActivityDataSet.Where(x => x.Date.Date == a).Average(x => x.Reps)), 
-                    sets = Convert.ToInt32(ActivityDataSet.Where(x => x.Date.Date == a).Average(x => x.Sets))
+                    sets = Convert.ToInt32(ActivityDataSet.Where(x => x.Date.Date == a).Sum(x => x.Sets))
 
                 };
                 exercisemachinechartlist.Add(exercisemachineobj);
