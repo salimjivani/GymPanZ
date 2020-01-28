@@ -129,7 +129,7 @@
                     <th></th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="previoustablebody">
 
             </tbody>
         </table>
@@ -149,22 +149,23 @@
         };
         //Gather previous workout data
         $('#exercisemachine').change(function () {
+            $("#previoustablebody").remove();
             exercisechange = $('#exercise').val();
             jsonactivity.Machine = exercisechange;
 
             $(document).ready(function () {
 
-                $.ajax({
-                    url: "/Home/ActivityTable",
-                    contentType: "application/json; charset=utf-8",
-                    dataType: "json",
-                    async: false,
-                    type: "POST",
-                    data: JSON.stringify(jsonactivity),
-                    success: function (json) {
-                        console.log(json);
-                    }
-                });
+                //$.ajax({
+                //    url: "/Home/ActivityTable",
+                //    contentType: "application/json; charset=utf-8",
+                //    dataType: "json",
+                //    async: false,
+                //    type: "POST",
+                //    data: JSON.stringify(jsonactivity),
+                //    success: function (json) {
+                //        console.log(json);
+                //    }
+                //});
 
                 $.ajax({
                     url: "/Home/Activities",
@@ -176,6 +177,7 @@
                     success: function (json) {
                         previousworkout = json;
                         console.log(json);
+
                         for (x = 0; x < json.length; x++)
                         {
                             let change; 

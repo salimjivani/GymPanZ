@@ -33,9 +33,51 @@
 
 <body>
     <div class="container" align="center">
-        <div id="bodyhalfchart"></div>
-        <div id="upperbody"></div>
-        <div id="lowerbody"></div>
+
+        <div id="daterange">
+            <table class="table">
+                <tr>
+                    <td align="right"><span>From: </span><input type="date" name="startrange" id="startrange" /></td>
+                    <td align="left">To: <input type="date" name="startrange" id="endrange" /></td>
+                </tr>
+                <tr>
+                    <td colspan="2" align="center"><button id="refresh" class="btn btn-default">Refresh</button></td>
+                </tr>
+            </table>
+        </div>
+
+        <div>
+            <h3>Body Half</h3>
+            <table id="bodyhalftable">
+                <tr id="upperbodyrow">
+                    <td>UpperBody: </td>
+                    <td id="upperbodyvalue"></td>
+                </tr>
+                <tr id="lowerbodyrow">
+                    <td>LowerBody: </td>
+                    <td id="lowerbodyvalue"></td>
+                </tr>
+            </table>
+        </div>
+
+        <br />
+
+        <h3>Upper Body</h3>
+        <div id="upperbody">
+            <table id="upperbodytable">
+                <tr></tr>
+            </table>
+        </div>
+
+        <br />
+
+        <h3>Lower Body</h3>
+        <div id="lowerbody">
+            <table id="lowerbodytable">
+                <tr></tr>
+            </table>
+        </div>
+
         <div id="chart-container"></div>
     </div>
 </body>
@@ -52,103 +94,101 @@
                 success: function (json) {
                     console.log(json);
 
+                    let bodyhalfpercentage;
+                    bodyhalfpercentage = json.piechart[0].value + json.piechart[1].value;
 
-                    //piechart
-                    FusionCharts.ready(function () {
-                        var shareChart = new FusionCharts({
-                            type: 'pie2d',
-                            renderAt: 'bodyhalfchart',
-                            width: '100%',
-                            height: '350',
-                            dataFormat: 'json',
-                            containerBackgroundOpacity: "0",
-                            dataSource: {
-                                "chart": {
-                                    "caption": "Upperbody vs Lowerbody",
-                                    "plottooltext": "<div id='nameDiv'><b>$label: </b>$percentValue<br/></div>",
-                                    "showLegend": "0",
-                                    "legendPosition": "right",
-                                    "startingAngle": "300",
-                                    "alignCaptionWithCanvas": "0",
-                                    "useDataPlotColorForLabels": "1",
-                                    "theme": "fint",
-                                    "paletteColors": "#8a2be2,#FF5904",
-                                    "canvasBgAlpha": "0",
-                                    "bgAlpha": 0,
-                                },
-                                "data": json.piechart
-                            }
-                        }).render();
-                    });
+                    $("#upperbodyvalue").text((json.piechart[0].value / bodyhalfpercentage).toFixed(2) * 100 + "%  (" + json.piechart[0].value + ")");
+                    $("#lowerbodyvalue").text((json.piechart[1].value / bodyhalfpercentage).toFixed(2) * 100 + "%  (" + json.piechart[1].value + ")");
 
-                    //UpperBody Radar Chart
-                    FusionCharts.ready(function () {
-                        var passengerChart = new FusionCharts({
-                            type: 'radar',
-                            renderAt: 'upperbody',
-                            width: '100%',
-                            height: '450',
-                            dataFormat: 'json',
-                            containerBackgroundOpacity: "0",
-                            dataSource: {
-                                "chart": {
-                                    "caption": "UpperBody Distribution",
-                                    "theme": "fint",
-                                    "showlimits": "0",
-                                    "showDivLineValues": "0",
-                                    "anchorRadius": "2",
-                                    "canvasBgAlpha": "0",
-                                    "bgAlpha": 0,
+                    var lowerbodypercentage = 0;
+                    for (x = 0; x < json.lowerbodycount.length; x++)
+                    {
+                        lowerbodypercentage += json.lowerbodycount[x].value; 
+                    }
 
-                                },
-                                "categories": [{
-                                    "category": json.upperbodylabel
-                                }],
-                                "dataset": [{
-                                    "seriesname": "Frequency",
-                                    "alpha": "20",
-                                    "data": json.upperbodycount
-                                }]
-                            }
-                        }).render();
-                    });
+                    for (x = 0; x < json.lowerbodycount.length; x++)
+                    {
+                        $("#lowerbodytable tr:last").after("<tr><td>" + json.lowerbodylabel[x].label + ": </td><td>" + (json.lowerbodycount[x].value/lowerbodypercentage).toFixed(2) * 100 + "%</td><td>(" + json.lowerbodycount[x].value + ")</td></tr>");
+                    }
 
-                    //LowerBody Radar Chart
-                    FusionCharts.ready(function () {
-                        var passengerChart = new FusionCharts({
-                            type: 'radar',
-                            renderAt: 'lowerbody',
-                            width: '100%',
-                            height: '450',
-                            dataFormat: 'json',
-                            containerBackgroundOpacity: "0",
-                            dataSource: {
-                                "chart": {
-                                    "caption": "Lowerbody distribution",
-                                    "theme": "fint",
-                                    "showlimits": "0",
-                                    "showDivLineValues": "0",
-                                    "anchorRadius": "2",
-                                    "canvasBgAlpha": "0",
-                                    "bgAlpha": 0,
-
-                                },
-                                "categories": [{
-                                    "category": json.lowerbodylabel
-                                }],
-                                "dataset": [{
-                                    "seriesname": "Frequency",
-                                    "alpha": "20",
-                                    "data": json.lowerbodycount
-                                }]
-                            }
-                        }).render();
-                    });
-
+                    var upperbodypercentage = 0;
+                    for (x = 0; x < json.upperbodycount.length; x++)
+                    {
+                        upperbodypercentage += json.upperbodycount[x].value;
+                    }
+                    for (x = 0; x < json.upperbodycount.length; x++)
+                    {
+                        $("#upperbodytable tr:last").after("<tr><td>" + json.upperbodylabel[x].label + ": </td><td>" + (json.upperbodycount[x].value / upperbodypercentage).toFixed(2) * 100 + "%</td><td>(" + json.upperbodycount[x].value + ")</td></tr>");
+                    }
                 },
+
                 error: function () {
                     console.log("ERROR");
                 }
             });
+
+        $("#refresh").click(function () {
+            //alert($("#startrange").val());
+            $("#lowerbodytable tr").remove();
+            $("#lowerbodytable").append("<tr></tr>");
+
+            $("#upperbodytable tr").remove();
+            $("#upperbodytable").append("<tr></tr>");
+
+            $.ajax({
+                url: "/Home/SummaryInformationFilter",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                async: false,
+                type: "POST",
+                data: JSON.stringify({'userid':userid , 'startrange': $("#startrange").val(), 'endrange': $("#endrange").val()}),
+                success: function (json) {
+                    console.log(json);
+
+                    let bodyhalfpercentage;
+                    bodyhalfpercentage = json.piechart[0].value + json.piechart[1].value;
+
+                    if (json.piechart[0].label == "Upper")
+                    {
+                        $("#upperbodyvalue").text((json.piechart[0].value / bodyhalfpercentage).toFixed(2) * 100 + "%  (" + json.piechart[0].value + ")");
+                    }
+                    else
+                    {
+                        $("#upperbodyvalue").text((json.piechart[1].value / bodyhalfpercentage).toFixed(2) * 100 + "%  (" + json.piechart[1].value + ")");
+                    }
+
+                    if (json.piechart[0].label == "Lower") {
+                        $("#lowerbodyvalue").text((json.piechart[0].value / bodyhalfpercentage).toFixed(2) * 100 + "%  (" + json.piechart[0].value + ")");
+                    }
+                    else {
+                        $("#lowerbodyvalue").text((json.piechart[1].value / bodyhalfpercentage).toFixed(2) * 100 + "%  (" + json.piechart[1].value + ")");
+                    }
+
+                    
+
+                    var lowerbodypercentage = 0;
+                    for (x = 0; x < json.lowerbodycount.length; x++) {
+                        lowerbodypercentage += json.lowerbodycount[x].value;
+                    }
+
+                    for (x = 0; x < json.lowerbodycount.length; x++) {
+                        $("#lowerbodytable tr:last").after("<tr><td>" + json.lowerbodylabel[x].label + ": </td><td>" + (json.lowerbodycount[x].value / lowerbodypercentage).toFixed(2) * 100 + "%</td><td>(" + json.lowerbodycount[x].value + ")</td></tr>");
+                    }
+
+                    var upperbodypercentage = 0;
+                    for (x = 0; x < json.upperbodycount.length; x++) {
+                        upperbodypercentage += json.upperbodycount[x].value;
+                    }
+                    for (x = 0; x < json.upperbodycount.length; x++) {
+                        $("#upperbodytable tr:last").after("<tr><td>" + json.upperbodylabel[x].label + ": </td><td>" + (json.upperbodycount[x].value / upperbodypercentage).toFixed(2) * 100 + "%</td><td>(" + json.upperbodycount[x].value + ")</td></tr>");
+                    }
+                },
+
+                error: function () {
+                    console.log("ERROR");
+                }
+            });
+
+        });
     });
 </script>

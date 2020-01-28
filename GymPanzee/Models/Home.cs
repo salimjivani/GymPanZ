@@ -65,6 +65,6 @@ namespace GymPanzee.Models
 
     public class TargetBodyPartCount
     {
-        public string value { get; set; }
+        public int value { get; set; }
     }
 }

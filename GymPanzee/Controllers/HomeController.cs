@@ -30,9 +30,8 @@ namespace GymPanzee.Controllers
             act.Time = 5;
             act.Sets = 10;
             act.Other = "tryingsomethingnew";
-            GympanzeeDBDataContext DB = new GympanzeeDBDataContext();
-            DB.Activities.InsertOnSubmit(act);
-            DB.SubmitChanges();
+            _dt.Activities.InsertOnSubmit(act);
+            _dt.SubmitChanges();
             Console.WriteLine("worked");
         }
        
@@ -48,17 +47,17 @@ namespace GymPanzee.Controllers
                 return View();
             }
 
+            //Request.Cookies["username"].Expires = DateTime.Now.AddDays(-1);
+
         }
 
         [HttpPost]
         public JsonResult ExerciseMachines(int exercisemachineid)
         {
 
-            GympanzeeDBDataContext userstable = new GympanzeeDBDataContext();
-
-            var exercisecategory = (from em in userstable.ExerciseMachines
-                                    join ec in userstable.ExerciseCategories on em.ExerciseCategoryID equals ec.ID
-                                    join eq in userstable.ExerciseEquipmentCategories on ec.ExerciseEquipmentCategory equals eq.ID
+            var exercisecategory = (from em in _dt.ExerciseMachines
+                                    join ec in _dt.ExerciseCategories on em.ExerciseCategoryID equals ec.ID
+                                    join eq in _dt.ExerciseEquipmentCategories on ec.ExerciseEquipmentCategory equals eq.ID
                                     select new { em, ec, eq }).ToList();
 
             var exercisemachine = exercisecategory.Where(x => x.em.ID == exercisemachineid).ToList();
@@ -99,10 +98,7 @@ namespace GymPanzee.Controllers
         [HttpPost]
         public JsonResult InsertActivities(Activity model)
         {
-            GympanzeeDBDataContext insertactivitiesDB = new GympanzeeDBDataContext();
-
-            insertactivitiesDB.insertactivity(model.UserID, model.FacilityID, model.ExerciseMachineID, model.Reps, model.Weights, model.Time, model.Other, model.Sets, model.Notes);
-
+            _dt.insertactivity(model.UserID, model.FacilityID, model.ExerciseMachineID, model.Reps, model.Weights, model.Time, model.Other, model.Sets, model.Notes);
 
             return Json("saved", JsonRequestBehavior.AllowGet);
         }
@@ -110,15 +106,13 @@ namespace GymPanzee.Controllers
         [HttpPost]
         public JsonResult Activities(int User, int Machine)
         {
-            GympanzeeDBDataContext Pastactivity = new GympanzeeDBDataContext();
-
-            var ActivityDataSet = (from a in Pastactivity.Activities
+            var ActivityDataSet = (from a in _dt.Activities
                                    where a.UserID == User && a.ExerciseMachineID == Machine
                                    orderby a.Date ascending
                                    select new { a.UserID, a.ExerciseMachineID, a.FacilityID, a.Reps, a.Weights, a.Time, a.Other, a.Date, a.Sets}).ToList();
 
             var exercisemachinechartlist = new List<ExcerciseMachineChartModel>();
-            var timelist = ActivityDataSet.Select(x => x.Date.Date).Distinct().ToList();
+            var timelist = ActivityDataSet.Select(x => x.Date.Date).Distinct().OrderBy(x => x.Date).ToList();
 
             foreach (var a in timelist)
             {
@@ -152,15 +146,9 @@ namespace GymPanzee.Controllers
         [HttpPost]
         public JsonResult GetUserID(string useremail)
         {
-            //HttpCookie gymuser = new HttpCookie("userid", "2");
-            //Response.Cookies.Add(gymuser);
-            //gymuser.Expires = DateTime.Now.AddHours(1);
+            _dt.Login(useremail);
 
-            GympanzeeDBDataContext Table = new GympanzeeDBDataContext();
-
-            Table.Login(useremail);
-
-            var UsersTable = (from a in Table.Users where a.Username == useremail select new { a.ID }).FirstOrDefault();
+            var UsersTable = (from a in _dt.Users where a.Username == useremail select new { a.ID }).FirstOrDefault();
 
             var Username = new Activity()
             {
@@ -172,22 +160,20 @@ namespace GymPanzee.Controllers
 
         public JsonResult SummaryInformation(int userid)
         {
-            GympanzeeDBDataContext table = new GympanzeeDBDataContext();
-
-            var activitydata = (from act in table.Activities
-                                join em in table.ExerciseMachines on act.ExerciseMachineID equals em.ID
-                                join tb in table.TargetBodyParts on em.TargetBodyPartID equals tb.ID
-                                join bh in table.BodyHalfs on tb.BodyHalfID equals bh.ID
+            var activitydata = (from act in _dt.Activities
+                                join em in _dt.ExerciseMachines on act.ExerciseMachineID equals em.ID
+                                join tb in _dt.TargetBodyParts on em.TargetBodyPartID equals tb.ID
+                                join bh in _dt.BodyHalfs on tb.BodyHalfID equals bh.ID
                                 where act.UserID == userid
                                 select new { act, em, tb, bh }).ToList();
 
-            var upperbodydata = (from tb in table.TargetBodyParts
-                                 join bh in table.BodyHalfs on tb.BodyHalfID equals bh.ID
+            var upperbodydata = (from tb in _dt.TargetBodyParts
+                                 join bh in _dt.BodyHalfs on tb.BodyHalfID equals bh.ID
                                  where bh.ID == 1
                                  select new { tb }).ToList();
 
-            var lowerbodydata = (from tb in table.TargetBodyParts
-                                 join bh in table.BodyHalfs on tb.BodyHalfID equals bh.ID
+            var lowerbodydata = (from tb in _dt.TargetBodyParts
+                                 join bh in _dt.BodyHalfs on tb.BodyHalfID equals bh.ID
                                  where bh.ID == 2
                                  select new { tb }).ToList();
 
@@ -260,7 +246,7 @@ namespace GymPanzee.Controllers
                 }
                 TargetBodyPartCount frequency = new TargetBodyPartCount
                 {
-                    value = count.ToString()
+                    value = count
                 };
 
                 summarycharts.upperbodycount.Add(frequency);
@@ -286,7 +272,7 @@ namespace GymPanzee.Controllers
                 }
                 TargetBodyPartCount frequency = new TargetBodyPartCount
                 {
-                    value = count.ToString()
+                    value = count
                 };
 
                 summarycharts.lowerbodycount.Add(frequency);
@@ -311,6 +297,158 @@ namespace GymPanzee.Controllers
             return View();
         }
 
+        public JsonResult SummaryInformationFilter(int userid, string startrange, string endrange)
+        {
+            DateTime start = DateTime.Parse(startrange);
+            DateTime end = DateTime.Parse(endrange);
+
+            var activitydata = (from act in _dt.Activities
+                                join em in _dt.ExerciseMachines on act.ExerciseMachineID equals em.ID
+                                join tb in _dt.TargetBodyParts on em.TargetBodyPartID equals tb.ID
+                                join bh in _dt.BodyHalfs on tb.BodyHalfID equals bh.ID
+                                where act.UserID == userid && act.Date >= start && act.Date <= end
+                                select new { act, em, tb, bh }).ToList();
+
+            var upperbodydata = (from tb in _dt.TargetBodyParts
+                                 join bh in _dt.BodyHalfs on tb.BodyHalfID equals bh.ID
+                                 where bh.ID == 1
+                                 select new { tb }).ToList();
+
+            var lowerbodydata = (from tb in _dt.TargetBodyParts
+                                 join bh in _dt.BodyHalfs on tb.BodyHalfID equals bh.ID
+                                 where bh.ID == 2
+                                 select new { tb }).ToList();
+
+            var SummaryData = new Summary()
+            {
+                UpperBody = new List<string>(),
+                LowerBody = new List<string>(),
+                SActivity = new List<SummaryActivity>()
+            };
+
+            foreach (var a in upperbodydata)
+            {
+                SummaryData.UpperBody.Add(a.tb.Value);
+            }
+
+            foreach (var a in lowerbodydata)
+            {
+                SummaryData.LowerBody.Add(a.tb.Value);
+            }
+
+            foreach (var a in activitydata)
+            {
+                SummaryActivity data = new SummaryActivity()
+                {
+                    ExerciseMachineValue = a.em.Type,
+                    Reps = a.act.Reps,
+                    Weights = a.act.Weights,
+                    Sets = a.act.Sets,
+                    Other = a.act.Other,
+                    BodyHalf = a.bh.Value,
+                    BodyPartTarget = a.tb.Value
+                };
+                SummaryData.SActivity.Add(data);
+            }
+
+            //piechart
+            var bodyhalfs = activitydata.Select(x => x.bh.Value).Distinct();
+            var piechartlist = new List<BodyHalfPieChart>();
+            foreach (var a in bodyhalfs)
+            {
+                BodyHalfPieChart piechartobj = new BodyHalfPieChart
+                {
+                    label = a,
+                    value = activitydata.Where(x => x.bh.Value == a).Count()
+                };
+                piechartlist.Add(piechartobj);
+            }
+
+            //Check Error if only one body half has been used
+            if (piechartlist.Count() == 1 && piechartlist[0].label == "Lower")
+            {
+                BodyHalfPieChart piecharobj = new BodyHalfPieChart
+                {
+                    label = "Upper",
+                    value = 0
+                };
+                piechartlist.Add(piecharobj);
+            }
+            else if(piechartlist.Count() == 1 && piechartlist[0].label == "Upper")
+            {
+                BodyHalfPieChart piecharobj = new BodyHalfPieChart
+                {
+                    label = "Lower",
+                    value = 0
+                };
+                piechartlist.Add(piecharobj);
+            }
+
+            //summary
+            var summarycharts = new ChartSummary()
+            {
+                upperbodylabel = new List<TargetBodyPartRadarChart>(),
+                upperbodycount = new List<TargetBodyPartCount>(),
+                lowerbodylabel = new List<TargetBodyPartRadarChart>(),
+                lowerbodycount = new List<TargetBodyPartCount>()
+            };
+            summarycharts.piechart = piechartlist;
+
+
+            //upperbody
+            foreach (var a in upperbodydata)
+            {
+                int count = 0;
+                foreach (var b in activitydata)
+                {
+                    if (b.tb.Value == a.tb.Value)
+                    {
+                        count++;
+                    }
+                }
+                TargetBodyPartCount frequency = new TargetBodyPartCount
+                {
+                    value = count
+                };
+
+                summarycharts.upperbodycount.Add(frequency);
+
+                TargetBodyPartRadarChart upperbodylist = new TargetBodyPartRadarChart
+                {
+                    label = a.tb.Value
+                };
+                summarycharts.upperbodylabel.Add(upperbodylist);
+            }
+
+
+            //lowerbody
+            foreach (var a in lowerbodydata)
+            {
+                int count = 0;
+                foreach (var b in activitydata)
+                {
+                    if (b.tb.Value == a.tb.Value)
+                    {
+                        count++;
+                    }
+                }
+                TargetBodyPartCount frequency = new TargetBodyPartCount
+                {
+                    value = count
+                };
+
+                summarycharts.lowerbodycount.Add(frequency);
+
+                TargetBodyPartRadarChart lowerbodylist = new TargetBodyPartRadarChart
+                {
+                    label = a.tb.Value
+                };
+                summarycharts.lowerbodylabel.Add(lowerbodylist);
+            }
+
+            return Json(summarycharts, JsonRequestBehavior.AllowGet);
+        }
+        
         public ActionResult Summary()
         {
 
