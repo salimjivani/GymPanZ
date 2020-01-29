@@ -222,6 +222,26 @@ namespace GymPanzee.Controllers
                 piechartlist.Add(piechartobj);
             }
 
+            //Check Error if only one body half has been used
+            if (piechartlist.Count() == 1 && piechartlist[0].label == "Lower")
+            {
+                BodyHalfPieChart piecharobj = new BodyHalfPieChart
+                {
+                    label = "Upper",
+                    value = 0
+                };
+                piechartlist.Add(piecharobj);
+            }
+            else if (piechartlist.Count() == 1 && piechartlist[0].label == "Upper")
+            {
+                BodyHalfPieChart piecharobj = new BodyHalfPieChart
+                {
+                    label = "Lower",
+                    value = 0
+                };
+                piechartlist.Add(piecharobj);
+            }
+
             //summary
             var summarycharts = new ChartSummary()
             {

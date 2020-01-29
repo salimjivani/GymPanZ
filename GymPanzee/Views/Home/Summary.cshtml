@@ -100,6 +100,20 @@
                     $("#upperbodyvalue").text((json.piechart[0].value / bodyhalfpercentage).toFixed(2) * 100 + "%  (" + json.piechart[0].value + ")");
                     $("#lowerbodyvalue").text((json.piechart[1].value / bodyhalfpercentage).toFixed(2) * 100 + "%  (" + json.piechart[1].value + ")");
 
+                    if (json.piechart[0].label == "Upper") {
+                        $("#upperbodyvalue").text((json.piechart[0].value / bodyhalfpercentage).toFixed(2) * 100 + "%  (" + json.piechart[0].value + ")");
+                    }
+                    else {
+                        $("#upperbodyvalue").text((json.piechart[1].value / bodyhalfpercentage).toFixed(2) * 100 + "%  (" + json.piechart[1].value + ")");
+                    }
+
+                    if (json.piechart[0].label == "Lower") {
+                        $("#lowerbodyvalue").text((json.piechart[0].value / bodyhalfpercentage).toFixed(2) * 100 + "%  (" + json.piechart[0].value + ")");
+                    }
+                    else {
+                        $("#lowerbodyvalue").text((json.piechart[1].value / bodyhalfpercentage).toFixed(2) * 100 + "%  (" + json.piechart[1].value + ")");
+                    }
+
                     var lowerbodypercentage = 0;
                     for (x = 0; x < json.lowerbodycount.length; x++)
                     {
